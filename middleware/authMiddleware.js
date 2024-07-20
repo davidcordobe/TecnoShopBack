@@ -1,10 +1,13 @@
+
 const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
-    const token = req.header('x-auth-token');
-    if (!token) {
+    const authHeader = req.header('Authorization');
+    if (!authHeader) {
         return res.status(401).json({ message: 'No hay token, permiso denegado' });
     }
+
+    const token = authHeader.split(' ')[1]; // Extraer el token después de 'Bearer '
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -16,3 +19,4 @@ const auth = (req, res, next) => {
 };
 
 module.exports = auth;
+

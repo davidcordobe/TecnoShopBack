@@ -3,8 +3,10 @@ const Producto = require('../models/modelos');
 // Crear un nuevo producto
 const crearProducto = async (req, res) => {
     const { nombre, precio, descripcion } = req.body;
+    const imagen = req.file ? req.file.path : null; 
+
     try {
-        const nuevoProducto = new Producto({ nombre, precio, descripcion });
+        const nuevoProducto = new Producto({ nombre, precio, descripcion, imagen });
         await nuevoProducto.save();
         res.status(201).json(nuevoProducto);
     } catch (err) {
@@ -26,6 +28,8 @@ const obtenerProductos = async (req, res) => {
 const actualizarProducto = async (req, res) => {
     const { id } = req.params;
     const { nombre, precio, descripcion } = req.body;
+    const imagen = req.file ? req.file.path : null;  
+
     try {
         const producto = await Producto.findById(id);
         if (!producto) {
@@ -35,6 +39,9 @@ const actualizarProducto = async (req, res) => {
         producto.nombre = nombre;
         producto.precio = precio;
         producto.descripcion = descripcion;
+        if (imagen) {
+            producto.imagen = imagen;
+        }
         await producto.save();
 
         res.json(producto);
@@ -50,6 +57,12 @@ const eliminarProducto = async (req, res) => {
         const productoEliminado = await Producto.findByIdAndDelete(id);
         if (!productoEliminado) {
             return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+
+        // Opcional: Eliminar el archivo de imagen si existe
+        if (productoEliminado.imagen) {
+            const fs = require('fs');
+            fs.unlinkSync(productoEliminado.imagen);
         }
 
         res.json({ message: 'Producto eliminado' });

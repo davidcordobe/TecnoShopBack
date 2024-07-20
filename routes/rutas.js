@@ -1,23 +1,19 @@
+
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/authMiddleware');
+const upload = require('../config/multer');
 const {
     crearProducto,
     obtenerProductos,
     actualizarProducto,
     eliminarProducto
 } = require('../controllers/controlador');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// GET /api/productos
-router.get('/', obtenerProductos);
-
-// POST /api/productos
-router.post('/', auth, crearProducto);
-
-// PUT /api/productos/:id
-router.put('/:id', auth, actualizarProducto);
-
-// DELETE /api/productos/:id
-router.delete('/:id', auth, eliminarProducto);
+// Rutas protegidas
+router.post('/', authMiddleware, upload.single('imagen'), crearProducto);
+router.get('/', authMiddleware, obtenerProductos);
+router.put('/:id', authMiddleware, upload.single('imagen'), actualizarProducto);
+router.delete('/:id', authMiddleware, eliminarProducto);
 
 module.exports = router;
