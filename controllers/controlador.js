@@ -17,10 +17,13 @@ const crearProducto = async (req, res) => {
 // Obtener todos los productos
 const obtenerProductos = async (req, res) => {
     try {
-        const productos = await Producto.find();
-        res.json(productos);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+        const producto = await Producto.findById(req.params.id);
+        if (!producto) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+        res.json(producto);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener el producto', error });
     }
 };
 

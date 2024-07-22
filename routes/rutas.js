@@ -11,7 +11,7 @@ const {
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Rutas protegidas
-router.post('/', authMiddleware, upload.single('imagen'), crearProducto);
+router.post('/crear', authMiddleware, upload.single('imagen'), crearProducto);
 router.get('/', authMiddleware, obtenerProductos);
 router.put('/:id', authMiddleware, upload.single('imagen'), actualizarProducto);
 router.delete('/:id', authMiddleware, eliminarProducto);
