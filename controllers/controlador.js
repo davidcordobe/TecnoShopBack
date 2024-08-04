@@ -3,11 +3,11 @@ const path = require('path');
 const Producto = require('../models/modelos');
 
 const crearProducto = async (req, res) => {
-    const { nombre, precio, descripcion } = req.body;
+    const { nombre, precio, descripcion, categoria } = req.body;
     const imagen = req.file ? req.file.path : null;
 
     try {
-        const nuevoProducto = new Producto({ nombre, precio, descripcion, imagen });
+        const nuevoProducto = new Producto({ nombre, precio, descripcion, imagen, categoria });
         await nuevoProducto.save();
         res.status(201).json(nuevoProducto);
     } catch (err) {
@@ -60,7 +60,7 @@ const eliminarProducto = async (req, res) => {
 
 const actualizarProducto = async (req, res) => {
     const { id } = req.params;
-    const { nombre, precio, descripcion } = req.body;
+    const { nombre, precio, descripcion, categoria } = req.body;
     const imagen = req.file ? req.file.path : null;
 
     try {
@@ -80,6 +80,7 @@ const actualizarProducto = async (req, res) => {
         producto.nombre = nombre;
         producto.precio = precio;
         producto.descripcion = descripcion;
+        producto.categoria = categoria;
         if (imagen) {
             producto.imagen = imagen;
         }
