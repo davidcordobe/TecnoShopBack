@@ -20,6 +20,9 @@ const productoSchema = new mongoose.Schema({
     imagen: {
         type: String,  
         required: true
+    },
+    subcategoria: {
+        type: String
     }
 });
 

@@ -2,12 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const Producto = require('../models/modelos');
 
+// Crear Producto
 const crearProducto = async (req, res) => {
-    const { nombre, precio, descripcion, categoria } = req.body;
+    const { nombre, precio, descripcion, categoria, subcategoria } = req.body;
     const imagen = req.file ? req.file.path : null;
 
     try {
-        const nuevoProducto = new Producto({ nombre, precio, descripcion, imagen, categoria });
+        const nuevoProducto = new Producto({ nombre, precio, descripcion, imagen, categoria, subcategoria });
         await nuevoProducto.save();
         res.status(201).json(nuevoProducto);
     } catch (err) {
@@ -15,6 +16,7 @@ const crearProducto = async (req, res) => {
     }
 };
 
+// Obtener Productos (Protegido)
 const obtenerProductos = async (req, res) => {
     try {
         const productos = await Producto.find();
@@ -27,12 +29,23 @@ const obtenerProductos = async (req, res) => {
     }
 };
 
+//  (sin autenticación)
+const obtenerProductosPublicos = async (req, res) => {
+    try {
+        const productos = await Producto.find(); // Puedes agregar filtros si es necesario
+        if (!productos) {
+            return res.status(404).json({ message: 'Productos no encontrados' });
+        }
+        res.json(productos);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los productos públicos', error });
+    }
+};
 
-
+// Eliminar Producto
 const eliminarProducto = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log('Received ID for deletion:', id); // Verifica que el ID sea el esperado
         if (!id) {
             return res.status(400).json({ message: 'Product ID is required' });
         }
@@ -53,14 +66,14 @@ const eliminarProducto = async (req, res) => {
         await Producto.findByIdAndDelete(id);
         res.status(200).json({ message: 'Product deleted successfully' });
     } catch (error) {
-        console.error('Failed to delete product', error);
         res.status(500).json({ message: 'Failed to delete product' });
     }
 };
 
+// Actualizar Producto
 const actualizarProducto = async (req, res) => {
     const { id } = req.params;
-    const { nombre, precio, descripcion, categoria } = req.body;
+    const { nombre, precio, descripcion, categoria, subcategoria } = req.body;
     const imagen = req.file ? req.file.path : null;
 
     try {
@@ -81,11 +94,12 @@ const actualizarProducto = async (req, res) => {
         producto.precio = precio;
         producto.descripcion = descripcion;
         producto.categoria = categoria;
+        producto.subcategoria = subcategoria;
         if (imagen) {
             producto.imagen = imagen;
         }
-        await producto.save();
 
+        await producto.save();
         res.json(producto);
     } catch (err) {
         res.status(400).json({ message: err.message });
@@ -95,6 +109,7 @@ const actualizarProducto = async (req, res) => {
 module.exports = {
     crearProducto,
     obtenerProductos,
+    obtenerProductosPublicos,
     actualizarProducto,
     eliminarProducto
 };
