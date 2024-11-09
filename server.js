@@ -12,7 +12,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-    origin: 'https://technoshopnc.com',
+    origin: ['https://technoshopnc.com', 'http://localhost:5173'],
 }));
 app.use(express.json());
 
