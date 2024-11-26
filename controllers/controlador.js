@@ -1,11 +1,8 @@
-const fs = require('fs');
-const path = require('path');
 const Producto = require('../models/modelos');
 
 // Crear Producto
 const crearProducto = async (req, res) => {
-    const { nombre, precio, descripcion, categoria, subcategoria } = req.body;
-    const imagen = req.file ? req.file.path : null;
+    const { nombre, precio, descripcion, categoria, subcategoria, imagen } = req.body;  // imagen vendrá como URL
 
     try {
         const nuevoProducto = new Producto({ nombre, precio, descripcion, imagen, categoria, subcategoria });
@@ -29,7 +26,7 @@ const obtenerProductos = async (req, res) => {
     }
 };
 
-//  (sin autenticación)
+// Obtener Productos Públicos (sin autenticación)
 const obtenerProductosPublicos = async (req, res) => {
     try {
         const productos = await Producto.find(); // Puedes agregar filtros si es necesario
@@ -55,14 +52,7 @@ const eliminarProducto = async (req, res) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Elimina la imagen asociada si existe
-        if (producto.imagen) {
-            const imagePath = path.join(__dirname, '..', producto.imagen);
-            fs.unlink(imagePath, (err) => {
-                if (err) console.error('Failed to delete image:', err);
-            });
-        }
-
+        // Elimina el producto de la base de datos (ya no hay necesidad de eliminar imágenes locales)
         await Producto.findByIdAndDelete(id);
         res.status(200).json({ message: 'Product deleted successfully' });
     } catch (error) {
@@ -73,8 +63,7 @@ const eliminarProducto = async (req, res) => {
 // Actualizar Producto
 const actualizarProducto = async (req, res) => {
     const { id } = req.params;
-    const { nombre, precio, descripcion, categoria, subcategoria } = req.body;
-    const imagen = req.file ? req.file.path : null;
+    const { nombre, precio, descripcion, categoria, subcategoria, imagen } = req.body; // imagen vendrá como URL
 
     try {
         const producto = await Producto.findById(id);
@@ -82,21 +71,14 @@ const actualizarProducto = async (req, res) => {
             return res.status(404).json({ message: 'Producto no encontrado' });
         }
 
-        // Elimina la imagen antigua si se sube una nueva
-        if (imagen && producto.imagen) {
-            const oldImagePath = path.join(__dirname, '..', producto.imagen);
-            fs.unlink(oldImagePath, (err) => {
-                if (err) console.error('Failed to delete old image:', err);
-            });
-        }
-
+        // No es necesario eliminar imágenes locales, solo actualizamos la URL
         producto.nombre = nombre;
         producto.precio = precio;
         producto.descripcion = descripcion;
         producto.categoria = categoria;
         producto.subcategoria = subcategoria;
         if (imagen) {
-            producto.imagen = imagen;
+            producto.imagen = imagen; // Actualizamos la URL de la imagen
         }
 
         await producto.save();
