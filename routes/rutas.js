@@ -17,7 +17,7 @@ router.post('/crear', authMiddleware, upload.single('imagen'), crearProducto);
 router.get('/', authMiddleware, obtenerProductos);
 router.put('/:id', authMiddleware, upload.single('imagen'), actualizarProducto);
 router.delete('/:id', authMiddleware, eliminarProducto);
-router.put('/productos/actualizar-precios', authMiddleware,actualizarPreciosPorCategoria);
+router.put('/productos/actualizar-precios/:id', authMiddleware,actualizarPreciosPorCategoria);
 
 
 
