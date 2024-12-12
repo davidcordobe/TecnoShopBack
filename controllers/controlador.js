@@ -64,7 +64,6 @@ const eliminarProducto = async (req, res) => {
     }
 };
 
-// Actualizar precios globalmente
 const actualizarPreciosGlobalmente = async (req, res) => {
     const porcentaje = parseFloat(req.body.porcentaje); // Convertimos el porcentaje a número
     if (isNaN(porcentaje) || porcentaje <= 0) {
@@ -73,12 +72,20 @@ const actualizarPreciosGlobalmente = async (req, res) => {
 
     try {
         // Actualizar los precios de todos los productos de manera masiva
-        await Producto.updateMany({}, [
+        const resultado = await Producto.updateMany({}, [
             { $set: { precio: { $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] } } }
         ]);
 
+        if (resultado.modifiedCount === 0) {
+            return res.status(404).json({ message: 'No se encontraron productos para actualizar.' });
+        }
+
         // Obtener los productos actualizados
         const productosActualizados = await Producto.find();
+
+        if (!productosActualizados || productosActualizados.length === 0) {
+            return res.status(404).json({ message: 'No se pudieron obtener los productos actualizados.' });
+        }
 
         res.status(200).json({
             message: 'Precios actualizados correctamente.',
@@ -89,6 +96,8 @@ const actualizarPreciosGlobalmente = async (req, res) => {
         res.status(500).json({ message: 'Hubo un problema al actualizar los precios. Intente nuevamente más tarde.' });
     }
 };
+
+
 
 module.exports = {
     crearProducto,
