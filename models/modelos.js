@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { actualizarProducto } = require('../controllers/controlador');
 
 const productoSchema = new mongoose.Schema({
     nombre: {
@@ -17,6 +18,10 @@ const productoSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 0, 
+    },
+    actualizarPecio:{
+        type:Number,
+        require:true
     },
     imagen: {
         type: String,  
