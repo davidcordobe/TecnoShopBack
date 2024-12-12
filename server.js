@@ -16,12 +16,21 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Rutas
+// Rutas de la API
 app.use('/api/auth', require('./routes/authRuta'));
 app.use('/api/productos', require('./routes/rutas'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Servir archivos estáticos de React en producción
+if (process.env.NODE_ENV === 'production') {
+    // Sirve los archivos estáticos del build de React
+    app.use(express.static(path.join(__dirname, 'build')));
 
+    // Redirige todas las rutas a index.html para que React Router las maneje
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    });
+}
 
-
+// Iniciar el servidor
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

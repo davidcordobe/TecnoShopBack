@@ -91,6 +91,8 @@ const actualizarProducto = async (req, res) => {
 const actualizarPreciosGlobalmente = async (req, res) => {
     const { porcentaje } = req.body; // Porcentaje enviado para aumentar los precios
 
+    console.log("Porcentaje recibido:", porcentaje); // Depuración para verificar valor
+
     // Validación de porcentaje
     if (isNaN(porcentaje) || porcentaje <= 0) {
         return res.status(400).json({ message: 'El porcentaje debe ser un número válido mayor que 0.' });
@@ -111,11 +113,6 @@ const actualizarPreciosGlobalmente = async (req, res) => {
                 { $set: { precio: { $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] } } }
             ]
         );
-
-        if (isNaN(porcentaje) || porcentaje <= 0) {
-            return res.status(400).json({ message: 'El porcentaje debe ser un número válido mayor que 0.' });
-        }
-        
 
         // Obtener los productos actualizados
         const productosActualizados = await Producto.find();
