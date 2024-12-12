@@ -86,6 +86,46 @@ const actualizarProducto = async (req, res) => {
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
+
+};
+const actualizarPreciosGlobalmente = async (req, res) => {
+    const porcentaje = parseFloat(req.body.porcentaje); // Convertimos el porcentaje a número
+
+    // Validación: Verifica que el porcentaje sea un número válido
+    if (isNaN(porcentaje) || porcentaje <= 0) {
+        return res.status(400).json({ message: 'El porcentaje debe ser un número mayor que 0.' });
+    }
+
+    try {
+        // Actualizar los precios de todos los productos de manera masiva
+        const resultado = await Producto.updateMany({}, [
+            { $set: { precio: { $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] } } }
+        ]);
+
+        console.log('Resultado de la actualización:', resultado); // Verifica que el resultado contenga productos modificados
+
+        if (resultado.modifiedCount === 0) {
+            return res.status(404).json({ message: 'No se encontraron productos para actualizar.' });
+        }
+
+        // Obtener los productos actualizados
+        const productosActualizados = await Producto.find();
+
+        console.log('Productos actualizados:', productosActualizados); // Asegúrate de que aquí tenemos productos
+
+        if (!productosActualizados || productosActualizados.length === 0) {
+            return res.status(404).json({ message: 'No se pudieron obtener los productos actualizados.' });
+        }
+
+        // Devolver los productos actualizados junto con el mensaje
+        return res.status(200).json({
+            message: 'Precios actualizados correctamente.',
+            productos: productosActualizados
+        });
+    } catch (err) {
+        console.error('Error al actualizar los precios:', err);
+        res.status(500).json({ message: 'Hubo un problema al actualizar los precios. Intente nuevamente más tarde.' });
+    }
 };
 
 module.exports = {
@@ -93,5 +133,6 @@ module.exports = {
     obtenerProductos,
     obtenerProductosPublicos,
     actualizarProducto,
-    eliminarProducto
+    eliminarProducto,
+    actualizarPreciosGlobalmente
 };
