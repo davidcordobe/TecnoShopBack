@@ -8,7 +8,8 @@ const {
     obtenerProductosPublicos,
     actualizarProducto,
     eliminarProducto,
-    actualizarPreciosGlobalmente
+    actualizarPreciosGlobalmente,
+    actualizarPreciosPorCategoria
 } = require('../controllers/controlador');
 const authMiddleware = require('../middleware/authMiddleware');
 
@@ -17,7 +18,7 @@ router.post('/crear', authMiddleware, upload.single('imagen'), crearProducto);
 router.get('/', authMiddleware, obtenerProductos);
 router.put('/:id', authMiddleware, upload.single('imagen'), actualizarProducto);
 router.delete('/:id', authMiddleware, eliminarProducto);
-router.put('/productos/actualizar-precios', authMiddleware, actualizarPreciosGlobalmente);
+router.put('/productos/actualizar-precios', authMiddleware,actualizarPreciosPorCategoria);
 
 
 

@@ -141,5 +141,5 @@ module.exports = {
     obtenerProductosPublicos,
     actualizarProducto,
     eliminarProducto,
-    actualizarPreciosGlobalmente
+    actualizarPreciosPorCategoria
 };
