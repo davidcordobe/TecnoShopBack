@@ -10,12 +10,13 @@ const app = express();
 // Conectar a la base de datos
 connectDB();
 
-// Middleware
 app.use(cors({
     origin: ['https://technoshopnc.com', 'http://localhost:5173'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-app.use(express.json());
 
+app.use(express.json());
 // Rutas de la API
 app.use('/api/auth', require('./routes/authRuta'));
 app.use('/api/productos', require('./routes/rutas'));
