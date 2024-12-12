@@ -88,41 +88,45 @@ const actualizarProducto = async (req, res) => {
     }
 
 };
-const actualizarPreciosGlobalmente = async (req, res) => {
-    const { porcentaje } = req.body; // Porcentaje enviado para aumentar los precios
+const actualizarPreciosPorCategoria = async (req, res) => {
+    const { porcentaje, categoria } = req.body; // Porcentaje y categoría enviados para aumentar los precios
 
-    // Validación de porcentaje
+    // Validación de entrada
     if (isNaN(porcentaje) || porcentaje <= 0) {
         return res.status(400).json({ message: 'El porcentaje debe ser un número válido mayor que 0.' });
     }
 
+    if (!categoria || typeof categoria !== 'string') {
+        return res.status(400).json({ message: 'Debe proporcionar una categoría válida.' });
+    }
+
     try {
-        // Obtener todos los productos
-        const productos = await Producto.find();
+        // Verificar si existen productos en la categoría
+        const productos = await Producto.find({ categoria });
 
         if (productos.length === 0) {
-            return res.status(404).json({ message: 'No se encontraron productos para actualizar.' });
+            return res.status(404).json({ message: `No se encontraron productos en la categoría "${categoria}".` });
         }
 
-        // Actualizar los precios de todos los productos
+        // Actualizar los precios de los productos de la categoría
         const resultados = await Producto.updateMany(
-            {}, // No se filtra ningún producto, se actualizan todos
+            { categoria }, // Filtrar por categoría
             [
                 { $set: { precio: { $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] } } }
             ]
         );
 
-        // Obtener los productos actualizados
-        const productosActualizados = await Producto.find();
+        // Obtener los productos actualizados de la categoría
+        const productosActualizados = await Producto.find({ categoria });
 
-        // Devolver los productos actualizados en la respuesta
+        // Devolver los productos actualizados
         res.status(200).json({
-            message: 'Precios actualizados correctamente.',
+            message: `Precios de la categoría "${categoria}" actualizados correctamente.`,
             productos: productosActualizados
         });
 
     } catch (err) {
-        console.error('Error al actualizar precios:', err);
+        console.error('Error al actualizar precios por categoría:', err);
         res.status(500).json({ message: 'Hubo un problema al actualizar los precios. Intente nuevamente más tarde.' });
     }
 };
