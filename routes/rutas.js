@@ -17,7 +17,8 @@ router.post('/crear', authMiddleware, upload.single('imagen'), crearProducto);
 router.get('/', authMiddleware, obtenerProductos);
 router.put('/:id', authMiddleware, upload.single('imagen'), actualizarProducto);
 router.delete('/:id', authMiddleware, eliminarProducto);
-router.put('/productos/actualizar-precios', actualizarPreciosGlobalmente);
+router.put('/productos/actualizar-precios', authMiddleware, actualizarPreciosGlobalmente);
+
 
 
 // Ruta pública para obtener productos
