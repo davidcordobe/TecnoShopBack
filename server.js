@@ -14,7 +14,10 @@ app.use(cors({
     origin: ['https://technoshopnc.com', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    preflightContinue: false, // No continuar con la preflight después de la respuesta
+    optionsSuccessStatus: 204, // Respuesta exitosa para OPTIONS
 }));
+
 
 app.use(express.json());
 // Rutas de la API
