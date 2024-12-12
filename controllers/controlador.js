@@ -90,45 +90,39 @@ const actualizarProducto = async (req, res) => {
 };
 
 
-const actualizarPreciosPorCategoria = async (req, res) => {
-    const { categoria, porcentaje } = req.body;
+const actualizarTodosLosPrecios = async (req, res) => {
+    const { porcentaje } = req.body;
 
     // Validación de datos
     if (isNaN(porcentaje) || porcentaje <= 0) {
         return res.status(400).json({ message: 'El porcentaje debe ser un número válido mayor que 0.' });
     }
-    
-    if (!categoria) {
-        return res.status(400).json({ message: 'La categoría es requerida.' });
-    }
 
     try {
-        // Obtener productos de la categoría
-        const productos = await Producto.find({ categoria });
-        if (productos.length === 0) {
+        // Actualizar todos los productos en la base de datos
+        const productosActualizados = await Producto.updateMany(
+            {}, // Sin filtro: se aplica a todos los documentos
+            [
+                {
+                    $set: {
+                        precio: {
+                            $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] // Redondear a 2 decimales
+                        }
+                    }
+                }
+            ]
+        );
+
+        if (productosActualizados.modifiedCount === 0) {
             return res.status(404).json({ message: 'No se encontraron productos para actualizar.' });
         }
 
-        // Validar y actualizar los precios
-        const actualizaciones = productos.map(async (producto) => {
-            const nuevoPrecio = producto.precio * (1 + porcentaje / 100);
-            if (nuevoPrecio < 0) {
-                throw new Error(`El precio calculado para el producto ${producto.nombre} es negativo.`);
-            }
-
-            // Actualizar el producto en la base de datos
-            await Producto.updateOne({ _id: producto._id }, { $set: { precio: nuevoPrecio.toFixed(2) } });
-        });
-
-        // Esperar que todas las actualizaciones se completen
-        await Promise.all(actualizaciones);
-
-        // Obtener los productos actualizados
-        const productosActualizados = await Producto.find({ categoria });
+        // Obtener los productos actualizados (opcional, para validar el cambio)
+        const productos = await Producto.find({});
 
         res.status(200).json({
-            message: 'Precios actualizados correctamente.',
-            productos: productosActualizados,
+            message: 'Todos los precios fueron actualizados correctamente.',
+            productos,
         });
     } catch (err) {
         console.error('Error al actualizar precios:', err);
@@ -141,11 +135,12 @@ const actualizarPreciosPorCategoria = async (req, res) => {
 
 
 
+
 module.exports = {
     crearProducto,
     obtenerProductos,
     obtenerProductosPublicos,
     actualizarProducto,
     eliminarProducto,
-    actualizarPreciosPorCategoria
+    actualizarTodosLosPrecios
 };
