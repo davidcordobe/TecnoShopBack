@@ -112,9 +112,10 @@ const actualizarPreciosGlobalmente = async (req, res) => {
             ]
         );
 
-        if (resultados.modifiedCount === 0) {
-            return res.status(404).json({ message: 'No se pudieron actualizar los precios.' });
+        if (isNaN(porcentaje) || porcentaje <= 0) {
+            return res.status(400).json({ message: 'El porcentaje debe ser un número válido mayor que 0.' });
         }
+        
 
         // Obtener los productos actualizados
         const productosActualizados = await Producto.find();
