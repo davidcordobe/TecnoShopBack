@@ -3,6 +3,13 @@ const Producto = require('../models/modelos');
 // Crear un producto
 const crearProducto = async (req, res) => {
     try {
+        // Validaciones: Verifica que los campos requeridos estén presentes
+        const { nombre, descripcion, precio, categoria, subcategoria, imagen } = req.body;
+        if (!nombre || !descripcion || !precio || !categoria || !subcategoria || !imagen) {
+            return res.status(400).json({ message: 'Por favor, completa todos los campos requeridos.' });
+        }
+
+        // Crear el producto
         const nuevoProducto = new Producto(req.body);
         const productoGuardado = await nuevoProducto.save();
         res.status(201).json(productoGuardado);
@@ -15,6 +22,7 @@ const crearProducto = async (req, res) => {
 // Obtener todos los productos (admin)
 const obtenerProductos = async (req, res) => {
     try {
+        // Obtener todos los productos
         const productos = await Producto.find() || [];
         res.status(200).json(productos);
     } catch (err) {
@@ -23,11 +31,11 @@ const obtenerProductos = async (req, res) => {
     }
 };
 
-
 // Obtener productos públicos (p.ej., visibles en el frontend)
 const obtenerProductosPublicos = async (req, res) => {
     try {
-        const productos = await Producto.find({ visible: true }); // Suponiendo que tienes un campo "visible"
+        // Obtener solo los productos que estén marcados como visibles
+        const productos = await Producto.find({ visible: true });
         res.status(200).json(productos);
     } catch (err) {
         console.error('Error al obtener los productos públicos:', err);
@@ -38,7 +46,14 @@ const obtenerProductosPublicos = async (req, res) => {
 // Actualizar un producto por ID
 const actualizarProducto = async (req, res) => {
     const { id } = req.params;
+
+    // Validaciones: Verifica que el ID esté presente y sea válido
+    if (!id) {
+        return res.status(400).json({ message: 'ID del producto no proporcionado.' });
+    }
+
     try {
+        // Actualizar el producto
         const productoActualizado = await Producto.findByIdAndUpdate(id, req.body, { new: true });
         if (!productoActualizado) {
             return res.status(404).json({ message: 'Producto no encontrado.' });
@@ -53,7 +68,14 @@ const actualizarProducto = async (req, res) => {
 // Eliminar un producto por ID
 const eliminarProducto = async (req, res) => {
     const { id } = req.params;
+
+    // Validaciones: Verifica que el ID esté presente
+    if (!id) {
+        return res.status(400).json({ message: 'ID del producto no proporcionado.' });
+    }
+
     try {
+        // Eliminar el producto
         const productoEliminado = await Producto.findByIdAndDelete(id);
         if (!productoEliminado) {
             return res.status(404).json({ message: 'Producto no encontrado.' });
@@ -65,8 +87,11 @@ const eliminarProducto = async (req, res) => {
     }
 };
 
+// Actualizar precios globalmente (porcentaje)
 const actualizarPreciosGlobalmente = async (req, res) => {
     const porcentaje = parseFloat(req.body.porcentaje); // Convertimos el porcentaje a número
+
+    // Validación: Verifica que el porcentaje sea un número válido
     if (isNaN(porcentaje) || porcentaje <= 0) {
         return res.status(400).json({ message: 'El porcentaje debe ser un número mayor que 0.' });
     }
@@ -97,8 +122,6 @@ const actualizarPreciosGlobalmente = async (req, res) => {
         res.status(500).json({ message: 'Hubo un problema al actualizar los precios. Intente nuevamente más tarde.' });
     }
 };
-
-
 
 module.exports = {
     crearProducto,
