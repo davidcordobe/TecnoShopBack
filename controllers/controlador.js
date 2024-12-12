@@ -19,7 +19,7 @@ const actualizarPreciosGlobalmente = async (req, res) => {
         const productosActualizados = await Promise.all(
             productos.map(async (producto) => {
                 const nuevoPrecio = producto.precio * (1 + porcentaje / 100); // Calculamos el nuevo precio
-                producto.precio = nuevoPrecio.toFixed(2); // Redondeamos a dos decimales
+                producto.precio = parseFloat(nuevoPrecio.toFixed(2)); // Convertimos a número y redondeamos a dos decimales
                 return producto.save(); // Guardamos el producto actualizado
             })
         );
