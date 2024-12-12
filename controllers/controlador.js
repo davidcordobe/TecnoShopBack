@@ -15,13 +15,14 @@ const crearProducto = async (req, res) => {
 // Obtener todos los productos (admin)
 const obtenerProductos = async (req, res) => {
     try {
-        const productos = await Producto.find();
+        const productos = await Producto.find() || [];
         res.status(200).json(productos);
     } catch (err) {
         console.error('Error al obtener los productos:', err);
-        res.status(500).json({ message: 'Error al obtener los productos.' });
+        res.status(500).json({ message: 'Error al obtener los productos.', productos: [] });
     }
 };
+
 
 // Obtener productos públicos (p.ej., visibles en el frontend)
 const obtenerProductosPublicos = async (req, res) => {
