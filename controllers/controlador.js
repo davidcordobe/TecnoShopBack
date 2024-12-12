@@ -89,40 +89,49 @@ const actualizarProducto = async (req, res) => {
 
 };
 const actualizarPreciosGlobalmente = async (req, res) => {
-    const porcentaje = parseFloat(req.body.porcentaje); // Asegúrate de que se convierte a un número flotante.
-    console.log('Porcentaje recibido:', req.body.porcentaje);
+    const { porcentaje } = req.body; // Porcentaje enviado para aumentar los precios
 
-    // Validación del porcentaje
+    // Validación de porcentaje
     if (isNaN(porcentaje) || porcentaje <= 0) {
-        return res.status(400).json({ message: 'El porcentaje debe ser un número mayor que 0.' });
+        return res.status(400).json({ message: 'El porcentaje debe ser un número válido mayor que 0.' });
     }
 
     try {
-        // Actualizar los precios de todos los productos con el nuevo porcentaje
-        const resultado = await Producto.updateMany({}, [
-            { $set: { precio: { $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] } } }
-        ]);
+        // Obtener todos los productos
+        const productos = await Producto.find();
 
-        // Verifica si se actualizó algún producto
-        if (resultado.modifiedCount === 0) {
+        if (productos.length === 0) {
             return res.status(404).json({ message: 'No se encontraron productos para actualizar.' });
+        }
+
+        // Actualizar los precios de todos los productos
+        const resultados = await Producto.updateMany(
+            {}, // No se filtra ningún producto, se actualizan todos
+            [
+                { $set: { precio: { $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] } } }
+            ]
+        );
+
+        if (resultados.modifiedCount === 0) {
+            return res.status(404).json({ message: 'No se pudieron actualizar los precios.' });
         }
 
         // Obtener los productos actualizados
         const productosActualizados = await Producto.find();
 
-        if (!productosActualizados || productosActualizados.length === 0) {
-            return res.status(404).json({ message: 'No se pudieron obtener los productos actualizados.' });
-        }
-
-        return res.status(200).json({
+        // Devolver los productos actualizados en la respuesta
+        res.status(200).json({
             message: 'Precios actualizados correctamente.',
             productos: productosActualizados
         });
+
     } catch (err) {
+        console.error('Error al actualizar precios:', err);
         res.status(500).json({ message: 'Hubo un problema al actualizar los precios. Intente nuevamente más tarde.' });
     }
 };
+
+
 
 
 
