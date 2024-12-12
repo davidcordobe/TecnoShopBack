@@ -103,36 +103,39 @@ const actualizarPreciosPorCategoria = async (req, res) => {
     }
 
     try {
-        // Actualizar los precios de los productos en la categoría especificada
-        const productosActualizados = await Producto.updateMany(
-            { categoria }, // Filtrar productos por la categoría
-            [
-                { 
-                    $set: { 
-                        precio: { 
-                            $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] 
-                        }
-                    }
-                }
-            ]
-        );
-
-        if (productosActualizados.modifiedCount === 0) {
+        // Obtener productos de la categoría
+        const productos = await Producto.find({ categoria });
+        if (productos.length === 0) {
             return res.status(404).json({ message: 'No se encontraron productos para actualizar.' });
         }
 
+        // Validar y actualizar los precios
+        const actualizaciones = productos.map(async (producto) => {
+            const nuevoPrecio = producto.precio * (1 + porcentaje / 100);
+            if (nuevoPrecio < 0) {
+                throw new Error(`El precio calculado para el producto ${producto.nombre} es negativo.`);
+            }
+
+            // Actualizar el producto en la base de datos
+            await Producto.updateOne({ _id: producto._id }, { $set: { precio: nuevoPrecio.toFixed(2) } });
+        });
+
+        // Esperar que todas las actualizaciones se completen
+        await Promise.all(actualizaciones);
+
         // Obtener los productos actualizados
-        const productos = await Producto.find({ categoria });
+        const productosActualizados = await Producto.find({ categoria });
 
         res.status(200).json({
             message: 'Precios actualizados correctamente.',
-            productos
+            productos: productosActualizados,
         });
     } catch (err) {
         console.error('Error al actualizar precios:', err);
         res.status(500).json({ message: 'Hubo un problema al actualizar los precios. Intente nuevamente más tarde.' });
     }
 };
+
 
 
 
