@@ -90,7 +90,7 @@ const actualizarProducto = async (req, res) => {
 };
 const actualizarPreciosGlobalmente = async (req, res) => {
     const porcentaje = parseFloat(req.body.porcentaje); // Convertimos el porcentaje a número
-
+    console.log("Datos recibidos:", req.body); // Verifica si el cuerpo de la solicitud es correcto
     // Validación: Verifica que el porcentaje sea un número válido
     if (isNaN(porcentaje) || porcentaje <= 0) {
         return res.status(400).json({ message: 'El porcentaje debe ser un número mayor que 0.' });
@@ -102,31 +102,26 @@ const actualizarPreciosGlobalmente = async (req, res) => {
             { $set: { precio: { $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] } } }
         ]);
 
-        console.log('Resultado de la actualización:', resultado); // Verifica que el resultado contenga productos modificados
-
         if (resultado.modifiedCount === 0) {
             return res.status(404).json({ message: 'No se encontraron productos para actualizar.' });
         }
 
         // Obtener los productos actualizados
         const productosActualizados = await Producto.find();
-
-        console.log('Productos actualizados:', productosActualizados); // Asegúrate de que aquí tenemos productos
-
+        
         if (!productosActualizados || productosActualizados.length === 0) {
             return res.status(404).json({ message: 'No se pudieron obtener los productos actualizados.' });
         }
 
-        // Devolver los productos actualizados junto con el mensaje
         return res.status(200).json({
             message: 'Precios actualizados correctamente.',
             productos: productosActualizados
         });
     } catch (err) {
-        console.error('Error al actualizar los precios:', err);
         res.status(500).json({ message: 'Hubo un problema al actualizar los precios. Intente nuevamente más tarde.' });
     }
 };
+
 
 module.exports = {
     crearProducto,
