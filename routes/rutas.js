@@ -7,7 +7,8 @@ const {
     obtenerProductos,
     obtenerProductosPublicos,
     actualizarProducto,
-    eliminarProducto
+    eliminarProducto,
+    actualizarPreciosGlobalmente
 } = require('../controllers/controlador');
 const authMiddleware = require('../middleware/authMiddleware');
 
