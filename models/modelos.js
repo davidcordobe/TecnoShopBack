@@ -25,5 +25,6 @@ const productoSchema = new mongoose.Schema({
         type: String
     }
 });
+//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 module.exports = mongoose.model('Producto', productoSchema);

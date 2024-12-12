@@ -17,6 +17,7 @@ router.get('/', authMiddleware, obtenerProductos);
 router.put('/:id', authMiddleware, upload.single('imagen'), actualizarProducto);
 router.delete('/:id', authMiddleware, eliminarProducto);
 router.put('/productos/actualizar-precios', actualizarPreciosGlobalmente);
+
 // Ruta pública para obtener productos
 router.get('/publicos', obtenerProductosPublicos);  // Nueva ruta pública
 
