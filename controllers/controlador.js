@@ -90,7 +90,7 @@ const actualizarProducto = async (req, res) => {
 };
 const actualizarPreciosGlobalmente = async (req, res) => {
     const porcentaje = parseFloat(req.body.porcentaje); // Convertimos el porcentaje a número
-    console.log("Datos recibidos:", req.body); // Verifica si el cuerpo de la solicitud es correcto
+
     // Validación: Verifica que el porcentaje sea un número válido
     if (isNaN(porcentaje) || porcentaje <= 0) {
         return res.status(400).json({ message: 'El porcentaje debe ser un número mayor que 0.' });
@@ -108,7 +108,7 @@ const actualizarPreciosGlobalmente = async (req, res) => {
 
         // Obtener los productos actualizados
         const productosActualizados = await Producto.find();
-        
+
         if (!productosActualizados || productosActualizados.length === 0) {
             return res.status(404).json({ message: 'No se pudieron obtener los productos actualizados.' });
         }
@@ -121,6 +121,7 @@ const actualizarPreciosGlobalmente = async (req, res) => {
         res.status(500).json({ message: 'Hubo un problema al actualizar los precios. Intente nuevamente más tarde.' });
     }
 };
+
 
 
 module.exports = {
