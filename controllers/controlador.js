@@ -88,7 +88,7 @@ const actualizarProducto = async (req, res) => {
     }
 
 };
-const Producto = require('../models/Producto'); // Asegúrate de importar el modelo Producto
+
 
 const actualizarPreciosPorCategoria = async (req, res) => {
     const { categoria, porcentaje } = req.body;
