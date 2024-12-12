@@ -89,19 +89,21 @@ const actualizarProducto = async (req, res) => {
 
 };
 const actualizarPreciosGlobalmente = async (req, res) => {
-    const porcentaje = parseFloat(req.body.porcentaje); // Convertimos el porcentaje a número
+    const porcentaje = parseFloat(req.body.porcentaje); // Asegúrate de que se convierte a un número flotante.
+    console.log('Porcentaje recibido:', req.body.porcentaje);
 
-    // Validación: Verifica que el porcentaje sea un número válido
+    // Validación del porcentaje
     if (isNaN(porcentaje) || porcentaje <= 0) {
         return res.status(400).json({ message: 'El porcentaje debe ser un número mayor que 0.' });
     }
 
     try {
-        // Actualizar los precios de todos los productos de manera masiva
+        // Actualizar los precios de todos los productos con el nuevo porcentaje
         const resultado = await Producto.updateMany({}, [
             { $set: { precio: { $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] } } }
         ]);
 
+        // Verifica si se actualizó algún producto
         if (resultado.modifiedCount === 0) {
             return res.status(404).json({ message: 'No se encontraron productos para actualizar.' });
         }
