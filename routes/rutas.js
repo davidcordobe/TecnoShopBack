@@ -14,8 +14,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 // Rutas protegidas (requieren autenticación)
 router.post('/crear', authMiddleware, upload.single('imagen'), crearProducto);
 router.get('/', authMiddleware, obtenerProductos);
-router.put('/actualizar-todos-precios', authMiddleware, actualizarTodosLosPrecios); // Debe ir antes
-router.put('/:id', authMiddleware, upload.single('imagen'), actualizarProducto);
+router.put('/actualizar-todos-precios', authMiddleware, actualizarTodosLosPrecios);
 router.delete('/:id', authMiddleware, eliminarProducto);
 
 // Ruta pública para obtener productos
