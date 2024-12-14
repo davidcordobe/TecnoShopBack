@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { actualizarProducto } = require('../controllers/controlador');
+
 
 const productoSchema = new mongoose.Schema({
     nombre: {
@@ -19,10 +19,6 @@ const productoSchema = new mongoose.Schema({
         required: true,
         min: 0, 
     },
-    actualizarPecio:{
-        type:Number,
-        require:true
-    },
     imagen: {
         type: String,  
         required: true
@@ -31,6 +27,6 @@ const productoSchema = new mongoose.Schema({
         type: String
     }
 });
-//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
 
 module.exports = mongoose.model('Producto', productoSchema);

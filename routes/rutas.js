@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const upload = require('../config/multer');
@@ -15,11 +14,9 @@ const authMiddleware = require('../middleware/authMiddleware');
 // Rutas protegidas (requieren autenticación)
 router.post('/crear', authMiddleware, upload.single('imagen'), crearProducto);
 router.get('/', authMiddleware, obtenerProductos);
+router.put('/actualizar-todos-precios', authMiddleware, actualizarTodosLosPrecios); // Debe ir antes
 router.put('/:id', authMiddleware, upload.single('imagen'), actualizarProducto);
 router.delete('/:id', authMiddleware, eliminarProducto);
-app.put('/api/productos/actualizar-todos-precios',actualizarTodosLosPrecios);
-
-
 
 // Ruta pública para obtener productos
 router.get('/publicos', obtenerProductosPublicos);  // Nueva ruta pública

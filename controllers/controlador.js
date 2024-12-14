@@ -91,44 +91,45 @@ const actualizarProducto = async (req, res) => {
 
 
 const actualizarTodosLosPrecios = async (req, res) => {
-    const { porcentaje } = req.body;
-
-    // Validación de datos
-    if (isNaN(porcentaje) || porcentaje <= 0) {
-        return res.status(400).json({ message: 'El porcentaje debe ser un número válido mayor que 0.' });
-    }
-
     try {
-        // Actualizar todos los productos en la base de datos
-        const productosActualizados = await Producto.updateMany(
-            {}, // Sin filtro: se aplica a todos los documentos
-            [
-                {
-                    $set: {
-                        precio: {
-                            $round: [{ $multiply: ["$precio", (1 + porcentaje / 100)] }, 2] // Redondear a 2 decimales
-                        }
-                    }
-                }
-            ]
-        );
+        const { porcentaje } = req.body;
 
-        if (productosActualizados.modifiedCount === 0) {
-            return res.status(404).json({ message: 'No se encontraron productos para actualizar.' });
+        // Validar el porcentaje
+        if (!porcentaje || typeof porcentaje !== 'number' || porcentaje <= 0) {
+            return res.status(400).json({ message: 'Porcentaje inválido.' });
         }
 
-        // Obtener los productos actualizados (opcional, para validar el cambio)
-        const productos = await Producto.find({});
+        // Obtener y actualizar todos los productos
+        const productos = await Producto.find();
 
-        res.status(200).json({
-            message: 'Todos los precios fueron actualizados correctamente.',
-            productos,
+        const productosActualizados = await Promise.all(
+            productos.map(async (producto) => {
+                // Calcular y redondear el nuevo precio
+                const nuevoPrecio = parseFloat(
+                    (producto.precio * (1 + porcentaje / 100)).toFixed(2)
+                );
+
+                // Actualizar el precio y guardar el producto
+                return Producto.findByIdAndUpdate(
+                    producto._id,
+                    { precio: nuevoPrecio },
+                    { new: true } // Devolver el documento actualizado
+                );
+            })
+        );
+
+        // Enviar respuesta con los productos actualizados
+        res.json({
+            message: 'Precios actualizados con éxito.',
+            productosActualizados,  // Enviar los productos actualizados correctamente
         });
-    } catch (err) {
-        console.error('Error al actualizar precios:', err);
-        res.status(500).json({ message: 'Hubo un problema al actualizar los precios. Intente nuevamente más tarde.' });
+    } catch (error) {
+        console.error('Error al actualizar precios:', error);
+        res.status(500).json({ message: 'Error actualizando precios.' });
     }
 };
+
+
 
 
 
