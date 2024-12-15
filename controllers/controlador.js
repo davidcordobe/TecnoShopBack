@@ -85,7 +85,51 @@ const actualizarProducto = async (req, res) => {
         producto.imagen = imagen;
 
         await producto.save();
+<<<<<<< HEAD
         res.status(200).json(producto);  // Responde con el producto actualizado
+=======
+        res.json(producto);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+
+};
+
+
+const actualizarTodosLosPrecios = async (req, res) => {
+    try {
+        const { porcentaje } = req.body;
+
+        // Validar el porcentaje
+        if (!porcentaje || typeof porcentaje !== 'number' || porcentaje <= 0) {
+            return res.status(400).json({ message: 'Porcentaje inválido.' });
+        }
+
+        // Obtener y actualizar todos los productos
+        const productos = await Producto.find();
+
+        const productosActualizados = await Promise.all(
+            productos.map(async (producto) => {
+                // Calcular y redondear el nuevo precio
+                const nuevoPrecio = Math.ceil(
+                    (producto.precio * (1 + porcentaje / 100)) / 10
+                ) * 10;
+
+                // Actualizar el precio y guardar el producto
+                return Producto.findByIdAndUpdate(
+                    producto._id,
+                    { precio: nuevoPrecio },
+                    { new: true } // Devolver el documento actualizado
+                );
+            })
+        );
+
+        // Enviar respuesta con los productos actualizados
+        res.json({
+            message: 'Precios actualizados con éxito.',
+            productosActualizados,  // Enviar los productos actualizados correctamente
+        });
+>>>>>>> d6cca905c4d01f0bc50dc3ca4d3d0c4e87c8592d
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al actualizar el producto' });
