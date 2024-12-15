@@ -105,9 +105,9 @@ const actualizarTodosLosPrecios = async (req, res) => {
         const productosActualizados = await Promise.all(
             productos.map(async (producto) => {
                 // Calcular y redondear el nuevo precio
-                const nuevoPrecio = parseFloat(
-                    (producto.precio * (1 + porcentaje / 100)).toFixed(2)
-                );
+                const nuevoPrecio = Math.ceil(
+                    (producto.precio * (1 + porcentaje / 100)) / 10
+                ) * 10;
 
                 // Actualizar el precio y guardar el producto
                 return Producto.findByIdAndUpdate(
