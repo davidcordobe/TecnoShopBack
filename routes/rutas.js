@@ -7,18 +7,18 @@ const {
     obtenerProductosPublicos,
     actualizarProducto,
     eliminarProducto,
-    actualizarTodosLosPrecios
 } = require('../controllers/controlador');
+const actualizarTodosLosPrecios = require('../controllers/aumentartodoslosprecios.js');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // Rutas protegidas (requieren autenticación)
-router.post('/crear', authMiddleware, upload.single('imagen'), crearProducto);
-router.get('/', authMiddleware, obtenerProductos);
-router.put('/actualizar-todos-precios', authMiddleware, actualizarTodosLosPrecios);
-router.put('/:id',authMiddleware,actualizarProducto);
-router.delete('/:id', authMiddleware, eliminarProducto);
+router.post('/crear', authMiddleware, upload.single('imagen'), crearProducto); // Crear producto
+router.get('/', authMiddleware, obtenerProductos); // Obtener productos
+router.put('/precios/actualizar-todos', authMiddleware, actualizarTodosLosPrecios); // Actualización masiva de precios
+router.put('/actualizar/:id', authMiddleware, actualizarProducto); // Actualizar producto individual por ID
+router.delete('/:id', authMiddleware, eliminarProducto); // Eliminar producto por ID
 
 // Ruta pública para obtener productos
-router.get('/publicos', obtenerProductosPublicos);  // Nueva ruta pública
+router.get('/publicos', obtenerProductosPublicos); // Obtener productos sin autenticación
 
 module.exports = router;

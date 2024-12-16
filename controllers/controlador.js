@@ -62,77 +62,35 @@ const eliminarProducto = async (req, res) => {
 
 // Actualizar Producto
 const actualizarProducto = async (req, res) => {
-    const { id } = req.params;
-    const { nombre, precio, descripcion, categoria, subcategoria, imagen } = req.body; // imagen vendrá como URL
+    const { id } = req.params;  // El id del producto a actualizar
+    const { nombre, descripcion, precio, categoria, subcategoria, imagen } = req.body;
+
+    if (!nombre || !descripcion || !precio || !imagen) {
+        return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    }
 
     try {
         const producto = await Producto.findById(id);
+
         if (!producto) {
-            return res.status(404).json({ message: 'Producto no encontrado' });
+            return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
-        // No es necesario eliminar imágenes locales, solo actualizamos la URL
+        // Actualiza los campos del producto
         producto.nombre = nombre;
-        producto.precio = precio;
         producto.descripcion = descripcion;
+        producto.precio = precio;
         producto.categoria = categoria;
         producto.subcategoria = subcategoria;
-        if (imagen) {
-            producto.imagen = imagen; // Actualizamos la URL de la imagen
-        }
+        producto.imagen = imagen;
 
         await producto.save();
-        res.json(producto);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-
-};
-
-
-const actualizarTodosLosPrecios = async (req, res) => {
-    try {
-        const { porcentaje } = req.body;
-
-        // Validar el porcentaje
-        if (!porcentaje || typeof porcentaje !== 'number' || porcentaje <= 0) {
-            return res.status(400).json({ message: 'Porcentaje inválido.' });
-        }
-
-        // Obtener y actualizar todos los productos
-        const productos = await Producto.find();
-
-        const productosActualizados = await Promise.all(
-            productos.map(async (producto) => {
-                // Calcular y redondear el nuevo precio
-                const nuevoPrecio = Math.ceil(
-                    (producto.precio * (1 + porcentaje / 100)) / 10
-                ) * 10;
-
-                // Actualizar el precio y guardar el producto
-                return Producto.findByIdAndUpdate(
-                    producto._id,
-                    { precio: nuevoPrecio },
-                    { new: true } // Devolver el documento actualizado
-                );
-            })
-        );
-
-        // Enviar respuesta con los productos actualizados
-        res.json({
-            message: 'Precios actualizados con éxito.',
-            productosActualizados,  // Enviar los productos actualizados correctamente
-        });
+        res.status(200).json(producto);  // Responde con el producto actualizado
     } catch (error) {
-        console.error('Error al actualizar precios:', error);
-        res.status(500).json({ message: 'Error actualizando precios.' });
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar el producto' });
     }
 };
-
-
-
-
-
 
 
 
@@ -142,6 +100,5 @@ module.exports = {
     obtenerProductos,
     obtenerProductosPublicos,
     actualizarProducto,
-    eliminarProducto,
-    actualizarTodosLosPrecios
+    eliminarProducto
 };
