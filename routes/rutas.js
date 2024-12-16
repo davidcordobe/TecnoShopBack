@@ -15,6 +15,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.post('/crear', authMiddleware, upload.single('imagen'), crearProducto);
 router.get('/', authMiddleware, obtenerProductos);
 router.put('/actualizar-todos-precios', authMiddleware, actualizarTodosLosPrecios);
+router.put('/:id',authMiddleware,actualizarProducto);
 router.delete('/:id', authMiddleware, eliminarProducto);
 
 // Ruta pública para obtener productos
