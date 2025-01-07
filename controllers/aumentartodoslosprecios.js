@@ -12,9 +12,11 @@ const actualizarTodosLosPrecios = async (req, res) => {
 
         const productosActualizados = await Promise.all(
             productos.map(async (producto) => {
-                const nuevoPrecio = parseFloat(
-                    (producto.precio * (1 + porcentaje / 100)).toFixed(2)
-                );
+                // Calcular el nuevo precio con el porcentaje
+                let nuevoPrecio = producto.precio * (1 + porcentaje / 100);
+
+                // Redondear al múltiplo de 100 más cercano
+                nuevoPrecio = Math.round(nuevoPrecio / 100) * 100;
 
                 return Producto.findByIdAndUpdate(
                     producto._id,
