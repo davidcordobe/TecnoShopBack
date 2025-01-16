@@ -16,7 +16,7 @@ const actualizarTodosLosPrecios = async (req, res) => {
                 let nuevoPrecio = producto.precio * (1 + porcentaje / 100);
 
                 // Redondear al múltiplo de 100 más cercano
-                nuevoPrecio = Math.round(nuevoPrecio / 100) * 100;
+                nuevoPrecio = Math.round(nuevoPrecio / 1000) * 1000;
 
                 return Producto.findByIdAndUpdate(
                     producto._id,
